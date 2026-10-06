@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:cabinet;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1
+    username: sa
+    password: ""
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  kafka:
+    consumer:
+      group-id: cabinet-service-test
+      auto-offset-reset: earliest
+    producer:
+      acks: all
+
+app:
+  expiry:
+    near-expiry-days: 2
+    scan-cron: "0 0 0 30 2 *"

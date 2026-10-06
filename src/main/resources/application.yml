@@ -1,0 +1,63 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: cabinet-service
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:cabinet}
+    username: ${DB_USER:cabinet}
+    password: ${DB_PASSWORD:cabinet}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+        format_sql: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP:localhost:9092}
+    consumer:
+      group-id: cabinet-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    listener:
+      ack-mode: record
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+
+app:
+  device:
+    key: ${DEVICE_KEY:device-secret-2026}
+  auth:
+    header: X-Staff-Token
+  expiry:
+    # 距保质期 <= 该天数判定为临期
+    near-expiry-days: ${NEAR_EXPIRY_DAYS:2}
+    scan-cron: ${EXPIRY_SCAN_CRON:0 */10 * * * *}
+  temperature:
+    chilled-min-c: 0.0
+    chilled-max-c: 8.0
+    frozen-max-c: -15.0
+    ambient-max-c: 30.0
+  settlement:
+    period-cron: "0 0 2 * * *"
+
+logging:
+  level:
+    com.community.cabinet: INFO
